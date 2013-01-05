@@ -101,10 +101,10 @@ echo -n "wifi.supplicant_scan_interval (is this actually used?): ";getprop wifi.
 
 # kernel tweaks
 echo; echo "$(date) kernel"
-echo 500 512000 64 2048 > /proc/sys/kernel/sem
-echo 3000000 > /proc/sys/kernel/sched_latency_ns
-echo 500000 > /proc/sys/kernel/sched_wakeup_granularity_ns
-echo 500000 > /proc/sys/kernel/sched_min_granularity_ns
+# echo 500 512000 64 2048 > /proc/sys/kernel/sem
+# echo 3000000 > /proc/sys/kernel/sched_latency_ns
+# echo 500000 > /proc/sys/kernel/sched_wakeup_granularity_ns
+# echo 500000 > /proc/sys/kernel/sched_min_granularity_ns
 echo 0 > /proc/sys/kernel/panic_on_oops
 echo 0 > /proc/sys/kernel/panic
 cat_msg_sysfile "sched_features: " /sys/kernel/debug/sched_features
