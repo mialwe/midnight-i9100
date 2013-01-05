@@ -5,10 +5,14 @@ on init
     export PATH /sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
     export ANDROID_ROOT /system
     export ANDROID_DATA /data
+    export ANDROID_CACHE /cache
+    export SECONDARY_STORAGE /emmc
     export EXTERNAL_STORAGE /sdcard
 
     mkdir /sdcard
     mkdir /sdcard1
+    mkdir /emmc
+    mkdir /usbdisk
     mkdir /system
     mkdir /data
     mkdir /cache
@@ -24,6 +28,11 @@ on init
     insmod /lib/modules/exfat_fs.ko
 
 on boot
+# Permissions for mDNIe
+    chown system media_rw /sys/class/mdnie/mdnie/mode
+    chown system media_rw /sys/class/mdnie/mdnie/outdoor
+    chown system media_rw /sys/class/mdnie/mdnie/scenario
+    write /sys/class/mdnie/mdnie/scenario 4
 
     ifup lo
     hostname localhost
@@ -34,7 +43,7 @@ on boot
 service ueventd /sbin/ueventd
     critical
 
-service recovery /sbin/recovery
+service recovery /sbin/recovery-loader
 
 service adbd /sbin/adbd recovery
     disabled
@@ -46,13 +55,14 @@ on property:ro.debuggable=1
 on property:adb.recovery=1
     write /sys/class/android_usb/android0/enable 0
     write /sys/class/android_usb/android0/idVendor 04e8
-    write /sys/class/android_usb/android0/idProduct 6860
-    write /sys/class/android_usb/android0/functions adb
+    write /sys/class/android_usb/android0/idProduct 685e
+    write /sys/class/android_usb/android0/functions mass_storage,adb
     write /sys/class/android_usb/android0/enable 1
     write /sys/class/android_usb/android0/iManufacturer $ro.product.manufacturer
     write /sys/class/android_usb/android0/iProduct $ro.product.model
     write /sys/class/android_usb/android0/iSerial $ro.serialno
     start adbd
+    setprop service.adb.root 1
 
 # Restart adbd so it can run as root
 on property:service.adb.root=1
