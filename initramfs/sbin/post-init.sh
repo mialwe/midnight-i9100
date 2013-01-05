@@ -13,7 +13,7 @@ $BB mount -t rootfs -o remount,rw rootfs
 # start logfile output
 echo
 echo "************************************************"
-echo "MIDNIGHT-I9100 BOOT LOG"
+echo "MIDNIGHT-I9100 POST-INIT BOOT LOG"
 echo "************************************************"
 echo
 echo "$(date)"
@@ -45,6 +45,10 @@ echo; echo "$(date) mount"
 for i in $($BB mount | $BB grep relatime | $BB cut -d " " -f3);do
     $BB mount -o remount,noatime $i
 done
+for i in $($BB mount | $BB grep ext4 | $BB cut -d " " -f3);do
+    $BB mount -o remount,commit=20 $i
+done
+
 $BB mount
 
 # read_ahead
@@ -60,8 +64,8 @@ echo; echo "$(date) vm"
 echo "0" > /proc/sys/vm/swappiness # Not really needed as no /swap used...
 echo "1500" > /proc/sys/vm/dirty_writeback_centisecs # Flush after 20sec. (o:500)
 echo "1500" > /proc/sys/vm/dirty_expire_centisecs # Pages expire after 20sec. (o:200)
-echo "5" > /proc/sys/vm/dirty_background_ratio # flush pages later (default 5% active mem)
-echo "15" > /proc/sys/vm/dirty_ratio # process writes pages later (default 20%)
+echo "10" > /proc/sys/vm/dirty_background_ratio # flush pages later (default 5% active mem)
+echo "20" > /proc/sys/vm/dirty_ratio # process writes pages later (default 20%)
 echo "3" > /proc/sys/vm/page-cluster
 echo "0" > /proc/sys/vm/laptop_mode
 echo "0" > /proc/sys/vm/oom_kill_allocating_task
@@ -107,7 +111,6 @@ echo; echo "$(date) kernel"
 # echo 500000 > /proc/sys/kernel/sched_min_granularity_ns
 echo 0 > /proc/sys/kernel/panic_on_oops
 echo 0 > /proc/sys/kernel/panic
-cat_msg_sysfile "sched_features: " /sys/kernel/debug/sched_features
 cat_msg_sysfile "sem: " /proc/sys/kernel/sem;
 cat_msg_sysfile "sched_latency_ns: " /proc/sys/kernel/sched_latency_ns
 cat_msg_sysfile "sched_wakeup_granularity_ns: " /proc/sys/kernel/sched_wakeup_granularity_ns
